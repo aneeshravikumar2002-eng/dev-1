@@ -58,8 +58,8 @@ pipeline {
                 echo 'Deploying to Kubernetes...'
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh """
-                        kubectl --kubeconfig=$KUBECONFIG apply -f devops-news-project/kuber/deployment.yml
-                        kubectl --kubeconfig=$KUBECONFIG apply -f devops-news-project/kuber/service.yml
+                        kubectl --kubeconfig=$KUBECONFIG apply -f k8s/deployment.yml
+                        kubectl --kubeconfig=$KUBECONFIG apply -f k8s/service.yml
                         kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news
                     """
                 }
