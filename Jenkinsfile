@@ -65,7 +65,7 @@ pipeline {
                     kubectl --kubeconfig=$KUBECONFIG set image deployment/news \
                     news=aneesh292002/news-app:${BUILD_NUMBER}
 
-                    kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news
+                    kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news-deployment
                     '''
                 }
             }
