@@ -12,7 +12,7 @@ pipeline {
         stage('Git Clone') {
             steps {
                 echo 'Checking out repository...'
-                git 'https://github.com/aneeshravikumar2002-eng/dev-1.git'
+                git branch: 'main', url: 'https://github.com/aneeshravikumar2002-eng/dev-1.git'
             }
         }
 
