@@ -1,32 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: news-app
+  name: news
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: news-app
+      app: news
   template:
     metadata:
       labels:
-        app: news-app
+        app: news
     spec:
       containers:
-      - name: news-app
+      - name: news
         image: aneesh292002/news-app:latest
         ports:
         - containerPort: 5000
-
         env:
         - name: DB_HOST
-          value: "newsdb.xxxxxx.ap-south-1.rds.amazonaws.com"
-
+          value: "your-rds-endpoint"
         - name: DB_USER
           value: "admin"
-
         - name: DB_PASSWORD
           value: "Devops123"
-
         - name: DB_NAME
           value: "newsdb"
