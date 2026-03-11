@@ -61,11 +61,16 @@ pipeline {
                     sh '''
                     kubectl --kubeconfig=$KUBECONFIG apply -f k8s/deployment.yml
                     kubectl --kubeconfig=$KUBECONFIG apply -f k8s/service.yml
+
+                    kubectl --kubeconfig=$KUBECONFIG set image deployment/news \
+                    news=aneesh292002/news-app:${BUILD_NUMBER}
+
                     kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news
                     '''
                 }
             }
         }
+
     }
 
     post {
