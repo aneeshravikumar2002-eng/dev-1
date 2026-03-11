@@ -60,7 +60,7 @@ pipeline {
                     sh """
                         kubectl --kubeconfig=$KUBECONFIG apply -f k8s/deployment.yml
                         kubectl --kubeconfig=$KUBECONFIG apply -f k8s/service.yml
-                        kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news-app
+                        kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news
                     """
                 }
             }
