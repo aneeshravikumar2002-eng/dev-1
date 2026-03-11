@@ -17,12 +17,4 @@ spec:
         image: aneesh292002/news-app:latest
         ports:
         - containerPort: 5000
-        env:
-        - name: DB_HOST
-          value: "your-rds-endpoint"
-        - name: DB_USER
-          value: "admin"
-        - name: DB_PASSWORD
-          value: "Devops123"
-        - name: DB_NAME
-          value: "newsdb"
+      
