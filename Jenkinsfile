@@ -1,11 +1,8 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKERHUB_USER = credentials('dockerhub-login')
-    }
-
     stages {
+
         stage('Git Clone') {
             steps {
                 echo 'Checking out repository...'
@@ -19,10 +16,10 @@ pipeline {
                     def scannerHome = tool 'SonarScanner'
                     withSonarQubeEnv('My SonarQube Server') {
                         sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                              -Dsonar.projectKey=python \
-                              -Dsonar.projectName=python \
-                              -Dsonar.sources=.
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=news-app \
+                        -Dsonar.projectName=news-app \
+                        -Dsonar.sources=.
                         """
                     }
                 }
@@ -32,23 +29,27 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                sh """
-                    docker build -t aneesh292002/news-app:${BUILD_NUMBER} \
-                                 -t aneesh292002/news-app:latest .
-                """
+                sh '''
+                docker build -t aneesh292002/news-app:${BUILD_NUMBER} \
+                             -t aneesh292002/news-app:latest .
+                '''
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
                 echo 'Pushing image to Docker Hub...'
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-login', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-                    sh """
-                        echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
-                        docker push aneesh292002/news-app:${BUILD_NUMBER}
-                        docker push aneesh292002/news-app:latest 
-                        docker logout
-                    """
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-login',
+                    usernameVariable: 'DOCKERHUB_USER',
+                    passwordVariable: 'DOCKERHUB_PASS'
+                )]) {
+                    sh '''
+                    echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                    docker push aneesh292002/news-app:${BUILD_NUMBER}
+                    docker push aneesh292002/news-app:latest
+                    docker logout
+                    '''
                 }
             }
         }
@@ -57,11 +58,11 @@ pipeline {
             steps {
                 echo 'Deploying to Kubernetes...'
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    sh """
-                        kubectl --kubeconfig=$KUBECONFIG apply -f k8s/deployment.yml
-                        kubectl --kubeconfig=$KUBECONFIG apply -f k8s/service.yml
-                        kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news
-                    """
+                    sh '''
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/deployment.yml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/service.yml
+                    kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news
+                    '''
                 }
             }
         }
