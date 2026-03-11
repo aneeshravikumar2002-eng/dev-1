@@ -3,6 +3,12 @@ pipeline {
 
     stages {
 
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
         stage('Git Clone') {
             steps {
                 echo 'Checking out repository...'
@@ -65,7 +71,7 @@ pipeline {
                     kubectl --kubeconfig=$KUBECONFIG set image deployment/news \
                     news=aneesh292002/news-app:${BUILD_NUMBER}
 
-                    kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news-deployment
+                    kubectl --kubeconfig=$KUBECONFIG rollout status deployment/news
                     '''
                 }
             }
