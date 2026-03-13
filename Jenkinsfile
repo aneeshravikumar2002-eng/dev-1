@@ -11,25 +11,20 @@ pipeline {
 
         stage('Git Clone') {
             steps {
-                echo 'Checking out repository...'
                 git branch: 'main', url: 'https://github.com/aneeshravikumar2002-eng/dev-1.git'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Run Tests & Coverage') {
+            agent {
+                docker {
+                    image 'python:3.9'
+                }
+            }
             steps {
-                echo 'Installing dependencies...'
                 sh '''
                 pip install -r requirements.txt
                 pip install pytest pytest-cov
-                '''
-            }
-        }
-
-        stage('Run Tests & Coverage') {
-            steps {
-                echo 'Running unit tests...'
-                sh '''
                 pytest --cov=. --cov-report=xml
                 '''
             }
@@ -62,7 +57,6 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image...'
                 sh '''
                 docker build -t aneesh292002/news-app:${BUILD_NUMBER} \
                 -t aneesh292002/news-app:latest .
@@ -72,7 +66,6 @@ pipeline {
 
         stage('Push to Docker Hub') {
             steps {
-                echo 'Pushing image to Docker Hub...'
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-login',
                     usernameVariable: 'DOCKERHUB_USER',
@@ -90,7 +83,6 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                echo 'Deploying to Kubernetes...'
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh '''
                     kubectl --kubeconfig=$KUBECONFIG apply -f k8s/deployment.yml
@@ -99,16 +91,6 @@ pipeline {
                     '''
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-
-        failure {
-            echo 'Build failed. Keeping Docker artifacts for debugging.'
         }
     }
 }
