@@ -16,6 +16,25 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing dependencies...'
+                sh '''
+                pip install -r requirements.txt
+                pip install pytest pytest-cov
+                '''
+            }
+        }
+
+        stage('Run Tests & Coverage') {
+            steps {
+                echo 'Running unit tests...'
+                sh '''
+                pytest --cov=. --cov-report=xml
+                '''
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 script {
@@ -25,9 +44,18 @@ pipeline {
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=news-app \
                         -Dsonar.projectName=news-app \
-                        -Dsonar.sources=.
+                        -Dsonar.sources=. \
+                        -Dsonar.python.coverage.reportPaths=coverage.xml
                         """
                     }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -72,10 +100,13 @@ pipeline {
                 }
             }
         }
-
     }
 
     post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+
         failure {
             echo 'Build failed. Keeping Docker artifacts for debugging.'
         }
