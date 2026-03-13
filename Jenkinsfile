@@ -9,22 +9,26 @@ pipeline {
             }
         }
 
-        stage('Git Clone') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/aneeshravikumar2002-eng/dev-1.git'
             }
         }
 
-        stage('Run Tests & Coverage') {
-            agent {
-                docker {
-                    image 'python:3.9'
-                }
-            }
+        stage('Install Python & Dependencies') {
             steps {
                 sh '''
-                pip install -r requirements.txt
-                pip install pytest pytest-cov
+                sudo apt-get update
+                sudo apt-get install -y python3 python3-pip
+                pip3 install -r requirements.txt
+                pip3 install pytest pytest-cov
+                '''
+            }
+        }
+
+        stage('Run Tests & Coverage') {
+            steps {
+                sh '''
                 pytest --cov=. --cov-report=xml
                 '''
             }
@@ -58,13 +62,13 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                docker build -t aneesh292002/news-app:${BUILD_NUMBER} \
-                -t aneesh292002/news-app:latest .
+                docker build -t aneesh292002/news-app:${BUILD_NUMBER} .
+                docker tag aneesh292002/news-app:${BUILD_NUMBER} aneesh292002/news-app:latest
                 '''
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-login',
