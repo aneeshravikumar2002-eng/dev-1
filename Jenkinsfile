@@ -2,13 +2,6 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Clean Workspace') {
-            steps {
-                deleteDir()
-            }
-        }
-
         stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/aneeshravikumar2002-eng/dev-1.git'
