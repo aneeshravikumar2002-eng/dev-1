@@ -15,20 +15,18 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                python3 --version
-                pip3 install --user -r requirements.txt
-                pip3 install --user pytest pytest-cov
-                '''
-            }
-        }
-
         stage('Run Tests & Coverage') {
             steps {
                 sh '''
-                python3 -m pytest --cov=. --cov-report=xml
+                docker run --rm \
+                -v $(pwd):/app \
+                -w /app \
+                python:3.9 \
+                bash -c "
+                pip install -r requirements.txt &&
+                pip install pytest pytest-cov &&
+                pytest --cov=. --cov-report=xml
+                "
                 '''
             }
         }
