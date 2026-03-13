@@ -15,13 +15,12 @@ pipeline {
             }
         }
 
-        stage('Install Python & Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 sh '''
-                sudo apt-get update
-                sudo apt-get install -y python3 python3-pip
-                pip3 install -r requirements.txt
-                pip3 install pytest pytest-cov
+                python3 --version
+                pip3 install --user -r requirements.txt
+                pip3 install --user pytest pytest-cov
                 '''
             }
         }
@@ -29,7 +28,7 @@ pipeline {
         stage('Run Tests & Coverage') {
             steps {
                 sh '''
-                pytest --cov=. --cov-report=xml
+                python3 -m pytest --cov=. --cov-report=xml
                 '''
             }
         }
