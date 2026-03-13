@@ -1,9 +1,14 @@
 from flask import Flask, render_template_string
 from datetime import datetime
+import logging
+import os
 
 app = Flask(__name__)
 
-news_list = [
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+NEWS_LIST = [
     "🚀 DevOps adoption is accelerating across global tech companies.",
     "☁️ Kubernetes remains the leading container orchestration platform.",
     "🤖 AI-powered automation is transforming CI/CD pipelines.",
@@ -90,11 +95,23 @@ Built with Flask | DevOps Demo Project
 
 @app.route("/")
 def home():
-    return render_template_string(
-        HTML_TEMPLATE,
-        news_list=news_list,
-        time=datetime.now().strftime("%d %b %Y %H:%M")
-    )
+    """
+    Render the news homepage.
+    """
+    try:
+        current_time = datetime.now().strftime("%d %b %Y %H:%M")
+
+        return render_template_string(
+            HTML_TEMPLATE,
+            news_list=NEWS_LIST,
+            time=current_time
+        )
+
+    except Exception as error:
+        logging.error("Error rendering homepage: %s", error)
+        return "Internal Server Error", 500
+
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
