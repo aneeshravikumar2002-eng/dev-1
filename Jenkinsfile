@@ -37,7 +37,7 @@ pipeline {
                 echo 'Building Docker image...'
                 sh '''
                 docker build -t aneesh292002/news-app:${BUILD_NUMBER} \
-                             -t aneesh292002/news-app:latest .
+                -t aneesh292002/news-app:latest .
                 '''
             }
         }
